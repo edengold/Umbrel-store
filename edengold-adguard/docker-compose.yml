@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: 192.168.1.15
+      APP_PORT: 3000
+  adguard:
+    image: adguard/adguardhome:v0.107.48
+    restart: on-failure
+    volumes:
+      - ${APP_DATA_DIR}/data/work/:/opt/adguardhome/work/
+      - ${APP_DATA_DIR}/data/conf/:/opt/adguardhome/conf/
+    networks:
+      adguard_net:
+        ipv4_address: 192.168.1.15
+networks:
+ adguard_net:
+  driver: macvlan
+  driver_opts:
+    parent: end0
+  ipam:
+    config:
+      - subnet: "192.168.1.0/24"
+        ip_range: "192.168.1.15/32"
+        gateway: "192.168.1.1"
+ adguard_net2:
+  driver: macvlan
+  driver_opts:
+    parent: end0
+  ipam:
+    config:
+      - subnet: "192.168.1.0/24"
+        ip_range: "192.168.1.20/32"
+        gateway: "192.168.1.1"
+#networks:
+#  home:
+#    name: home
+#    external: true
+### TO CREATE THE NETWORK
+### docker network create home \
+###  --driver macvlan \
+###  --opt parent=end0 \
+###  --subnet 192.168.1.0/24 \
+###  --ip-range 192.168.1.0/24 \
+###  --gateway 192.168.1.1
